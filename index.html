@@ -18,6 +18,8 @@
                 <li><a href="#skills">技能</a></li>
                 <li><a href="#journey">历程</a></li>
                 <li><a href="#blog">博客</a></li>
+                <li><a href="#gallery">相册</a></li>
+                <li><a href="#messages">留言</a></li>
             </ul>
         </div>
     </nav>
@@ -180,6 +182,55 @@
         </div>
     </section>
 
+    <!-- Gallery Section -->
+    <section id="gallery" class="gallery section">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">相册</h2>
+                <div class="section-divider"></div>
+            </div>
+            <div class="gallery-grid" id="gallery-grid">
+                <!-- Dynamic gallery images will be loaded here -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Messages Section -->
+    <section id="messages" class="messages section">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">留言</h2>
+                <div class="section-divider"></div>
+            </div>
+            <div class="messages-content">
+                <div class="messages-form-container">
+                    <h3>给我留言</h3>
+                    <form id="message-form" class="message-form">
+                        <div class="form-group">
+                            <label for="name">姓名</label>
+                            <input type="text" id="name" name="name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="email">邮箱</label>
+                            <input type="email" id="email" name="email" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="content">留言内容</label>
+                            <textarea id="content" name="content" rows="5" required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">发送留言</button>
+                    </form>
+                </div>
+                <div class="messages-list-container">
+                    <h3>留言列表</h3>
+                    <div id="messages-list" class="messages-list">
+                        <!-- Dynamic messages will be loaded here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- Footer -->
     <footer class="footer">
         <div class="container">
@@ -195,6 +246,7 @@
                 </div>
                 <div class="footer-copyright">
                     <p>&copy; 2024 Mei. All rights reserved.</p>
+                    <p><a href="/admin/login.html" class="admin-login-link" style="color: #B6DDDC; text-decoration: none;">管理员登录</a></p>
                 </div>
             </div>
         </div>

@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理后台</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="admin-container">
+        <header class="admin-header">
+            <h1>Mei的个人网站管理后台</h1>
+            <div class="user-info">
+                <span id="username-display"></span>
+                <button id="logout-btn">退出登录</button>
+            </div>
+        </header>
+
+        <nav class="admin-nav">
+            <ul>
+                <li><a href="#blog" class="nav-link active">博客管理</a></li>
+                <li><a href="#gallery" class="nav-link">相册管理</a></li>
+                <li><a href="#messages" class="nav-link">留言管理</a></li>
+            </ul>
+        </nav>
+
+        <main class="admin-main">
+            <!-- 博客管理模块 -->
+            <section id="blog" class="admin-section active">
+                <div class="section-header">
+                    <h2>博客管理</h2>
+                    <button id="add-blog-btn" class="add-btn">添加博客</button>
+                </div>
+                
+                <!-- 博客表单 -->
+                <div id="blog-form-container" class="form-container hidden">
+                    <form id="blog-form">
+                        <input type="hidden" id="blog-id">
+                        <div class="form-group">
+                            <label for="blog-title">标题</label>
+                            <input type="text" id="blog-title" name="title" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="blog-content">内容</label>
+                            <textarea id="blog-content" name="content" rows="10" required></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="blog-image">图片</label>
+                            <input type="file" id="blog-image" name="image">
+                        </div>
+                        <div class="form-actions">
+                            <button type="submit" class="save-btn">保存</button>
+                            <button type="button" id="cancel-blog-btn" class="cancel-btn">取消</button>
+                        </div>
+                    </form>
+                </div>
+                
+                <!-- 博客列表 -->
+                <div class="data-list">
+                    <h3>博客列表</h3>
+                    <div id="blog-list" class="list-container"></div>
+                </div>
+            </section>
+
+            <!-- 相册管理模块 -->
+            <section id="gallery" class="admin-section">
+                <div class="section-header">
+                    <h2>相册管理</h2>
+                    <button id="add-gallery-btn" class="add-btn">上传图片</button>
+                </div>
+                
+                <!-- 相册表单 -->
+                <div id="gallery-form-container" class="form-container hidden">
+                    <form id="gallery-form">
+                        <div class="form-group">
+                            <label for="gallery-image">图片</label>
+                            <input type="file" id="gallery-image" name="image" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="gallery-caption">描述</label>
+                            <input type="text" id="gallery-caption" name="caption">
+                        </div>
+                        <div class="form-actions">
+                            <button type="submit" class="save-btn">上传</button>
+                            <button type="button" id="cancel-gallery-btn" class="cancel-btn">取消</button>
+                        </div>
+                    </form>
+                </div>
+                
+                <!-- 相册列表 -->
+                <div class="data-list">
+                    <h3>相册列表</h3>
+                    <div id="gallery-list" class="list-container gallery-grid"></div>
+                </div>
+            </section>
+
+            <!-- 留言管理模块 -->
+            <section id="messages" class="admin-section">
+                <div class="section-header">
+                    <h2>留言管理</h2>
+                </div>
+                
+                <!-- 留言列表 -->
+                <div class="data-list">
+                    <h3>留言列表</h3>
+                    <div id="messages-list" class="list-container"></div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

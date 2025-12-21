@@ -139,7 +139,229 @@ class ImagePreloader {
     }
 }
 
-// Initialize image preloader
+// API Base URL
+const API_BASE_URL = window.location.origin;
+
+// Blog Data Loader
+class BlogLoader {
+    constructor() {
+        this.init();
+    }
+    
+    init() {
+        this.loadBlogPosts();
+    }
+    
+    async loadBlogPosts() {
+        try {
+            const response = await fetch(API_BASE_URL + '/api/blog');
+            const blogPosts = await response.json();
+            this.renderBlogPosts(blogPosts);
+        } catch (error) {
+            console.error('Failed to load blog posts:', error);
+        }
+    }
+    
+    renderBlogPosts(blogPosts) {
+        const blogSlider = document.querySelector('.blog-slider');
+        if (!blogSlider) return;
+        
+        // Clear existing static content
+        blogSlider.innerHTML = '';
+        
+        // Render dynamic blog posts
+        blogPosts.forEach(post => {
+            const blogCard = document.createElement('div');
+            blogCard.className = 'blog-card';
+            
+            // Format date
+            const date = new Date(post.created_at).toISOString().split('T')[0].replace(/-/g, '.');
+            
+            // Create blog card content
+            blogCard.innerHTML = `
+                <div class="blog-image" ${post.image ? `style="background-image: url('uploads/${post.image}')"` : ''}></div>
+                <div class="blog-content">
+                    <span class="blog-date">${date}</span>
+                    <h3>${post.title}</h3>
+                    <p>${post.content.substring(0, 100)}...</p>
+                    <a href="#" class="blog-link">阅读更多 →</a>
+                </div>
+            `;
+            
+            blogSlider.appendChild(blogCard);
+        });
+        
+        // If no blog posts, show message
+        if (blogPosts.length === 0) {
+            blogSlider.innerHTML = '<p style="text-align: center; color: #666; width: 100%; padding: 40px;">暂无博客文章</p>';
+        }
+    }
+}
+
+// Gallery Data Loader
+class GalleryLoader {
+    constructor() {
+        this.init();
+    }
+    
+    init() {
+        this.loadGalleryImages();
+    }
+    
+    async loadGalleryImages() {
+        try {
+            const response = await fetch(API_BASE_URL + '/api/gallery');
+            const galleryImages = await response.json();
+            this.renderGalleryImages(galleryImages);
+        } catch (error) {
+            console.error('Failed to load gallery images:', error);
+        }
+    }
+    
+    renderGalleryImages(galleryImages) {
+        const galleryGrid = document.getElementById('gallery-grid');
+        if (!galleryGrid) return;
+        
+        // Clear existing content
+        galleryGrid.innerHTML = '';
+        
+        // Render dynamic gallery images
+        galleryImages.forEach(image => {
+            const galleryItem = document.createElement('div');
+            galleryItem.className = 'gallery-item';
+            
+            // Format date
+            const date = new Date(image.created_at).toISOString().split('T')[0].replace(/-/g, '.');
+            
+            // Create gallery item content
+            galleryItem.innerHTML = `
+                <div class="gallery-image">
+                    <img src="uploads/${image.filename}" alt="${image.caption || 'Gallery Image'}">
+                    <div class="gallery-overlay">
+                        <p class="gallery-caption">${image.caption || '无描述'}</p>
+                        <span class="gallery-date">${date}</span>
+                    </div>
+                </div>
+            `;
+            
+            galleryGrid.appendChild(galleryItem);
+        });
+        
+        // If no gallery images, show message
+        if (galleryImages.length === 0) {
+            galleryGrid.innerHTML = '<p style="text-align: center; color: #666; width: 100%; padding: 40px;">暂无相册图片</p>';
+        }
+    }
+}
+
+// Messages Handler
+class MessagesHandler {
+    constructor() {
+        this.init();
+    }
+    
+    init() {
+        this.loadMessages();
+        this.bindFormEvents();
+    }
+    
+    async loadMessages() {
+        try {
+            const response = await fetch(API_BASE_URL + '/api/messages');
+            const messages = await response.json();
+            this.renderMessages(messages);
+        } catch (error) {
+            console.error('Failed to load messages:', error);
+        }
+    }
+    
+    renderMessages(messages) {
+        const messagesList = document.getElementById('messages-list');
+        if (!messagesList) return;
+        
+        // Clear existing content
+        messagesList.innerHTML = '';
+        
+        // Render dynamic messages
+        messages.forEach(message => {
+            const messageItem = document.createElement('div');
+            messageItem.className = 'message-item';
+            
+            // Format date
+            const date = new Date(message.created_at).toISOString().split('T')[0].replace(/-/g, '.');
+            
+            // Create message item content
+            messageItem.innerHTML = `
+                <div class="message-header">
+                    <h4 class="message-name">${message.name}</h4>
+                    <span class="message-date">${date}</span>
+                    <span class="message-email">${message.email}</span>
+                </div>
+                <div class="message-content">
+                    <p>${message.content}</p>
+                </div>
+            `;
+            
+            messagesList.appendChild(messageItem);
+        });
+        
+        // If no messages, show message
+        if (messages.length === 0) {
+            messagesList.innerHTML = '<p style="text-align: center; color: #666; width: 100%; padding: 40px;">暂无留言</p>';
+        }
+    }
+    
+    bindFormEvents() {
+        const messageForm = document.getElementById('message-form');
+        if (!messageForm) return;
+        
+        messageForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            // Get form data
+            const formData = new FormData(messageForm);
+            const messageData = {
+                name: formData.get('name'),
+                email: formData.get('email'),
+                content: formData.get('content')
+            };
+            
+            try {
+                // Submit message to API
+                const response = await fetch(API_BASE_URL + '/api/messages', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(messageData)
+                });
+                
+                const result = await response.json();
+                
+                if (result.message === 'Message sent successfully') {
+                    // Show success message
+                    alert('留言发送成功！');
+                    
+                    // Clear form
+                    messageForm.reset();
+                    
+                    // Reload messages to show the new one
+                    this.loadMessages();
+                } else {
+                    alert('留言发送失败，请重试。');
+                }
+            } catch (error) {
+                console.error('Failed to send message:', error);
+                alert('留言发送失败，请检查网络连接。');
+            }
+        });
+    }
+}
+
+// Initialize image preloader, blog loader, gallery loader, and messages handler
 document.addEventListener('DOMContentLoaded', () => {
     const imagePreloader = new ImagePreloader();
+    const blogLoader = new BlogLoader();
+    const galleryLoader = new GalleryLoader();
+    const messagesHandler = new MessagesHandler();
 });
