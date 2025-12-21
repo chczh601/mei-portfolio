@@ -184,7 +184,7 @@ class BlogLoader {
                     <span class="blog-date">${date}</span>
                     <h3>${post.title}</h3>
                     <p>${post.content.substring(0, 100)}...</p>
-                    <a href="#" class="blog-link">阅读更多 →</a>
+                    <a href="#" class="blog-link" onclick="showBlogDetail(${post.id}); return false;">阅读更多 →</a>
                 </div>
             `;
             
@@ -365,3 +365,64 @@ document.addEventListener('DOMContentLoaded', () => {
     const galleryLoader = new GalleryLoader();
     const messagesHandler = new MessagesHandler();
 });
+
+// Blog Detail Modal
+async function showBlogDetail(postId) {
+    try {
+        const response = await fetch(API_BASE_URL + `/api/blog/${postId}`);
+        const post = await response.json();
+        
+        // Create modal elements if they don't exist
+        let modal = document.getElementById('blog-modal');
+        if (!modal) {
+            modal = document.createElement('div');
+            modal.id = 'blog-modal';
+            modal.className = 'blog-modal';
+            modal.innerHTML = `
+                <div class="blog-modal-content">
+                    <span class="blog-modal-close">&times;</span>
+                    <div class="blog-modal-header">
+                        <h2 id="blog-modal-title"></h2>
+                        <span id="blog-modal-date"></span>
+                    </div>
+                    <div class="blog-modal-image" id="blog-modal-image"></div>
+                    <div class="blog-modal-content-text" id="blog-modal-content"></div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            
+            // Add close event
+            const closeBtn = modal.querySelector('.blog-modal-close');
+            closeBtn.onclick = () => {
+                modal.style.display = 'none';
+            };
+            
+            // Close when clicking outside
+            const closeModalOnOutsideClick = (event) => {
+                if (event.target == modal) {
+                    modal.style.display = 'none';
+                }
+            };
+            window.addEventListener('click', closeModalOnOutsideClick);
+        }
+        
+        // Populate modal content
+        document.getElementById('blog-modal-title').textContent = post.title;
+        document.getElementById('blog-modal-date').textContent = new Date(post.created_at).toISOString().split('T')[0].replace(/-/g, '.');
+        document.getElementById('blog-modal-content').textContent = post.content;
+        
+        const modalImage = document.getElementById('blog-modal-image');
+        if (post.image) {
+            modalImage.style.backgroundImage = `url('uploads/${post.image}')`;
+            modalImage.style.display = 'block';
+        } else {
+            modalImage.style.display = 'none';
+        }
+        
+        // Show modal
+        modal.style.display = 'block';
+    } catch (error) {
+        console.error('Failed to load blog detail:', error);
+        alert('加载博客详情失败，请重试。');
+    }
+}

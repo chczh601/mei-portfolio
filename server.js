@@ -25,7 +25,7 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage })
 
 const app = express();
-const PORT = 3000;
+const PORT = 3001;
 
 // 配置中间件
 app.use(cors());
