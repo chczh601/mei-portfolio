@@ -7,32 +7,52 @@ const path = require('path');
 const cors = require('cors');
 const fs = require('fs');
 
-// 创建上传目录
-if (!fs.existsSync('./uploads')) {
-  fs.mkdirSync('./uploads');
+// 创建上传目录（仅在非生产环境）
+if (process.env.NODE_ENV !== 'production') {
+  if (!fs.existsSync('./uploads')) {
+    fs.mkdirSync('./uploads');
+  }
 }
 
 // 配置文件上传
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, './uploads')
-  },
-  filename: function (req, file, cb) {
-    cb(null, Date.now() + '-' + file.originalname)
-  }
-})
+let upload;
 
-const upload = multer({ storage: storage })
+if (process.env.NODE_ENV === 'production') {
+  // 在生产环境中禁用文件上传，因为Vercel文件系统是只读的
+  upload = {
+    single: () => (req, res, next) => {
+      // 模拟文件上传，不实际保存文件
+      req.file = null;
+      next();
+    }
+  };
+} else {
+  // 在开发环境中使用真实的文件上传
+  const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+      cb(null, './uploads')
+    },
+    filename: function (req, file, cb) {
+      cb(null, Date.now() + '-' + file.originalname)
+    }
+  });
+  
+  upload = multer({ storage: storage });
+}
 
 const app = express();
-const PORT = 3001;
+const PORT = process.env.PORT || 3001;
 
 // 配置中间件
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(express.static('.'));
-app.use('/uploads', express.static('uploads'));
+app.use(express.static('public'));
+
+// 仅在开发环境中提供uploads目录的静态资源服务
+if (process.env.NODE_ENV !== 'production') {
+  app.use('/uploads', express.static('uploads'));
+}
 
 // 配置会话 - 使用内存存储
 app.use(session({
@@ -172,9 +192,9 @@ app.delete('/api/blog/:id', isAuthenticated, (req, res) => {
     return res.status(404).json({ message: 'Blog post not found' });
   }
   
-  // 删除图片文件
+  // 删除图片文件（仅在开发环境）
   const post = memoryDB.blog_posts[postIndex];
-  if (post.image) {
+  if (post.image && process.env.NODE_ENV !== 'production') {
     const imagePath = path.join(__dirname, 'uploads', post.image);
     if (fs.existsSync(imagePath)) {
       fs.unlinkSync(imagePath);
@@ -196,7 +216,7 @@ app.get('/api/gallery', (req, res) => {
 // 上传相册图片
 app.post('/api/gallery', isAuthenticated, upload.single('image'), (req, res) => {
   const { caption } = req.body;
-  const filename = req.file.filename;
+  const filename = req.file ? req.file.filename : null;
   
   const newImage = {
     id: nextIds.gallery_images++,
@@ -219,11 +239,13 @@ app.delete('/api/gallery/:id', isAuthenticated, (req, res) => {
     return res.status(404).json({ message: 'Image not found' });
   }
   
-  // 删除图片文件
+  // 删除图片文件（仅在开发环境）
   const image = memoryDB.gallery_images[imageIndex];
-  const imagePath = path.join(__dirname, 'uploads', image.filename);
-  if (fs.existsSync(imagePath)) {
-    fs.unlinkSync(imagePath);
+  if (process.env.NODE_ENV !== 'production') {
+    const imagePath = path.join(__dirname, 'uploads', image.filename);
+    if (fs.existsSync(imagePath)) {
+      fs.unlinkSync(imagePath);
+    }
   }
   
   // 删除数据库记录
@@ -269,13 +291,18 @@ app.delete('/api/messages/:id', isAuthenticated, (req, res) => {
 });
 
 // 为admin目录创建静态文件服务
-app.use('/admin', express.static(path.join(__dirname, 'admin')));
+app.use('/admin', express.static(path.join(__dirname, 'public', 'admin')));
 
 // 为管理后台其他页面添加认证中间件（除了登录页面）
 app.use('/admin/dashboard.html', isAuthenticated, (req, res, next) => next());
 
-// 启动服务器
-app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
-  console.log(`Admin panel available at http://localhost:${PORT}/admin`);
-});
+// 导出应用供Vercel使用
+module.exports = app;
+
+// 仅在本地开发时启动服务器
+if (process.env.NODE_ENV !== 'production') {
+  app.listen(PORT, () => {
+    console.log(`Server running on http://localhost:${PORT}`);
+    console.log(`Admin panel available at http://localhost:${PORT}/admin`);
+  });
+}
