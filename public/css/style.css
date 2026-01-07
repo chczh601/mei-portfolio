@@ -239,6 +239,19 @@ body {
     transform: translateY(-5px);
 }
 
+.about-photo {
+    width: 100%;
+    aspect-ratio: 3/4;
+    border-radius: 10px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+    object-fit: cover;
+}
+
+.about-image:hover .about-photo {
+    transform: translateY(-5px);
+}
+
 .about-text h3 {
     font-size: 1.8rem;
     font-weight: 600;

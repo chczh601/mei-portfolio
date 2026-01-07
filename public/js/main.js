@@ -142,58 +142,71 @@ class ImagePreloader {
 // API Base URL
 const API_BASE_URL = window.location.origin;
 
-// Blog Data Loader
+// Project Data Loader
 class BlogLoader {
     constructor() {
         this.init();
     }
     
     init() {
-        this.loadBlogPosts();
+        this.loadProjects();
     }
     
-    async loadBlogPosts() {
+    async loadProjects() {
         try {
-            const response = await fetch(API_BASE_URL + '/api/blog');
-            const blogPosts = await response.json();
-            this.renderBlogPosts(blogPosts);
+            // 使用静态项目数组替代API调用
+            const projects = [
+                {
+                    title: "运势占卜网站",
+                    content: "一个基于Web的运势占卜应用，使用HTML、CSS和JavaScript开发，部署在GitHub Pages上。用户可以输入生日获取运势预测。",
+                    link: "https://chczh601.github.io/luck/",
+                    created_at: "2024-12-10"
+                },
+                {
+                    title: "世界人文风景网站",
+                    content: "一个简约舒适的世界人文风情展示网站，支持中英双语 + 交互地图 + 多条件筛选。",
+                    link: "https://chczh601.github.io/wordview/",
+                    created_at: "2024-12-15"
+                }
+            ];
+            this.renderProjects(projects);
         } catch (error) {
-            console.error('Failed to load blog posts:', error);
+            console.error('Failed to load projects:', error);
         }
     }
     
-    renderBlogPosts(blogPosts) {
-        const blogSlider = document.querySelector('.blog-slider');
-        if (!blogSlider) return;
+    renderProjects(projects) {
+        const projectSlider = document.querySelector('.blog-slider');
+        if (!projectSlider) return;
         
         // Clear existing static content
-        blogSlider.innerHTML = '';
+        projectSlider.innerHTML = '';
         
-        // Render dynamic blog posts
-        blogPosts.forEach(post => {
-            const blogCard = document.createElement('div');
-            blogCard.className = 'blog-card';
+        // Render dynamic projects
+        projects.forEach(project => {
+            const projectCard = document.createElement('div');
+            projectCard.className = 'blog-card';
             
             // Format date
-            const date = new Date(post.created_at).toISOString().split('T')[0].replace(/-/g, '.');
+            const date = new Date(project.created_at).toISOString().split('T')[0].replace(/-/g, '.');
             
-            // Create blog card content
-            blogCard.innerHTML = `
-                <div class="blog-image" ${post.image ? `style="background-image: url('uploads/${post.image}')"` : ''}></div>
+            // Create project card content
+            projectCard.innerHTML = `
+                <div class="blog-image" ${project.image ? `style="background-image: url('images/${project.image}')"` : ''}></div>
                 <div class="blog-content">
                     <span class="blog-date">${date}</span>
-                    <h3>${post.title}</h3>
-                    <p>${post.content.substring(0, 100)}...</p>
-                    <a href="#" class="blog-link" onclick="showBlogDetail(${post.id}); return false;">阅读更多 →</a>
+                    <h3>${project.title}</h3>
+                    <p>${project.content}</p>
+                    <a href="${project.link}" class="blog-link" target="_blank" rel="noopener noreferrer">访问项目 →</a>
                 </div>
             `;
             
-            blogSlider.appendChild(blogCard);
+            projectSlider.appendChild(projectCard);
         });
         
-        // If no blog posts, show message
-        if (blogPosts.length === 0) {
-            blogSlider.innerHTML = '<p style="text-align: center; color: #666; width: 100%; padding: 40px;">暂无博客文章</p>';
+        // If no projects, show message
+        if (projects.length === 0) {
+            projectSlider.innerHTML = '<p style="text-align: center; color: #666; width: 100%; padding: 40px;">暂无项目</p>';
         }
     }
 }
@@ -210,8 +223,15 @@ class GalleryLoader {
     
     async loadGalleryImages() {
         try {
-            const response = await fetch(API_BASE_URL + '/api/gallery');
-            const galleryImages = await response.json();
+            // 使用静态图片数组替代API调用
+            const galleryImages = [
+                { filename: '乡村？阳光！夏天的乐园！.jpg', caption: '乡村？阳光！夏天的乐园！', created_at: '2024-12-10' },
+                { filename: '亲手制作六足蜘蛛机器人！.png', caption: '亲手制作六足蜘蛛机器人！', created_at: '2024-12-10' },
+                { filename: '参加了“进入小学，走上讲台”的志愿活动，为小孩子讲解课外知识.jpg', caption: '参加了“进入小学，走上讲台”的志愿活动，为小孩子讲解课外知识', created_at: '2024-12-10' },
+                { filename: '参加了金秋杯一同演唱《越人歌》，一首委婉动听的曲子.jpg', caption: '参加了金秋杯一同演唱《越人歌》，一首委婉动听的曲子', created_at: '2024-12-10' },
+                { filename: '恬静淡雅的书房.png', caption: '恬静淡雅的书房', created_at: '2024-12-10' },
+                { filename: '暑期实践中体验无人机.JPG', caption: '暑期实践中体验无人机', created_at: '2024-12-10' }
+            ];
             this.renderGalleryImages(galleryImages);
         } catch (error) {
             console.error('Failed to load gallery images:', error);
@@ -236,7 +256,7 @@ class GalleryLoader {
             // Create gallery item content
             galleryItem.innerHTML = `
                 <div class="gallery-image">
-                    <img src="uploads/${image.filename}" alt="${image.caption || 'Gallery Image'}">
+                    <img src="images/${image.filename}" alt="${image.caption || 'Gallery Image'}">
                     <div class="gallery-overlay">
                         <p class="gallery-caption">${image.caption || '无描述'}</p>
                         <span class="gallery-date">${date}</span>
