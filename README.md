@@ -1,6 +1,6 @@
 # Mei's Personal Website
 
-A highly personalized personal blog/portfolio website with a natural, refreshing design style.
+A highly personalized personal portfolio website with a natural, refreshing design style.
 
 ## Project Overview
 
